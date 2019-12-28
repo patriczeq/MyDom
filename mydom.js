@@ -97,7 +97,7 @@
       };
       var _el_ = new El__();
       _el_.el = ell;
-      _el_.hasClass = function() {
+      	_el_.hasClass = function() {
           if (!arguments.length) {
             throw Error(exceptionstrings("argmissing", [1]));
           }
@@ -277,6 +277,7 @@
           ell.before(obj);
           return new MyDOM(ell);
         },
+        _el_.height,
         _el_._height = function() {
           if (!arguments.length) {
             return ell.getBoundingClientRect().height;
@@ -285,6 +286,7 @@
             return new MyDOM(ell);
           }
         },
+        _el_.width,
         _el_._width = function() {
           if (!arguments.length) {
             return ell.getBoundingClientRect().width;
@@ -444,13 +446,13 @@
   var _mdm_ = new MYD_();
   /* ******************************************** */
   /* 	BASE LOAD */
-  window.MyDOM = _mdm_._md_slctr_;
+  window.myDOM = _mdm_._md_slctr_;
   /* ajax */
-  window.MyDOM.get = _mdm_._md_xhr_().get;
-  window.MyDOM.post = _mdm_._md_xhr_().post;
-  window.MyDOM.ajax = _mdm_._md_xhr_().ajax;
-  window.MyDOM.template = _mdm_._md_xhr_().template;
+  window.myDOM.get = _mdm_._md_xhr_().get;
+  window.myDOM.post = _mdm_._md_xhr_().post;
+  window.myDOM.ajax = _mdm_._md_xhr_().ajax;
+  window.myDOM.template = _mdm_._md_xhr_().template;
   /* Rename */
-  window.$ = window.MyDOM;
+  window.$ = window.myDOM;
   /* ******************************************** */
 })(window);
