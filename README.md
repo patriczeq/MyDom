@@ -10,15 +10,16 @@ Thesee prototypes are usually getters/setters for selector.
 When U use setter functionality, object returns back itself (U can continue with prototypes).
 
 Example (ES5):
-
-`$("body")
+```
+$("body")
   .css({"background": "#000", "color", "#fff"})
   .html(
     '<ul>'
       +'<li>First item</li>'+
       +'<li>Second item</li>'+
       +'<li>Third item</li>'+
-    '</ul>')`
+    '</ul>')
+```
 
 # ajax functionality
 
