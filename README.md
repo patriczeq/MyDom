@@ -33,5 +33,9 @@ Simply add `<script src="mydom.js"></script>` at the end of `BODY`
 | *Prototype* | *Inputs* | *Output* |
 |----------|----------|----------|
 | *hasClass* | `String` | `Boolean` |
-|----------|----------|----------|
+| *toggleClass* | `String` | `Boolean` |
+| *toggleClass* | `String` | `Boolean` |
+| *toggleClass* | `String` | `Boolean` |
+| *toggleClass* | `String` | `Boolean` |
+| *toggleClass* | `String` | `Boolean` |
 | *toggleClass* | `String` | `Boolean` |
