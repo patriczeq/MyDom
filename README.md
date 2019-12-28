@@ -2,16 +2,22 @@
 jQuery syntax friendly library
 
 # Selector functionality
-$("body") returns `BODY` HTMLElement from document. 
+`myDOM("body")` returns `BODY` HTMLElement from document. 
 It's shortcut of `document.querySelector("body")`, so it native support default prototypes/object getters & setters.
 
 Library has predefined jQuery like prototypes like `css`,`attr` or `html` (see bellow). 
 Thesee prototypes are usually getters/setters for selector.
 When U use setter functionality, object returns back itself (U can continue with prototypes).
 
+It supports classes `myDOM(".foo")`, ids `myDOM("#bar")`, props `myDOM("[foo='bar']")` and HTMLElements itself.
+```
+var body = document.querySelector("body"),
+s_body = myDOM(body);
+```
+
 Example (ES5):
 ```
-$("body")
+myDOM("body")
   .css({"background": "#000", "color", "#fff"})
   .html(
     '<ul>'
@@ -22,11 +28,54 @@ $("body")
 ```
 
 # ajax functionality
+Library using native `XMLHttpRequest`.
+Synchronous functions:
+```
+var get_response = myDOM.get("http://yourdomain.com"),
+  post_response = myDOM.post("http://yourdomain.com",{
+    login: "foo",
+    pwd: "bar"
+  });
+```
+Async:
+```
+myDOM.get("http://yourdomain.com",function(response){
+  console.log(response);
+});
+myDOM.post("http://yourdomain.com",{
+    login: "foo",
+    pwd: "bar"
+  },
+  function(response){
+    console.log(response);
+});
+```
+
+Full configurated:
+```
+myDOM.ajax({
+  method: "POST", // POST\GET
+  dataType: "JSON", // HTML / JSON / plain -> parser, if missing, uses autodetect
+  url: "http://yourdomain.com", // if missing, uses "/"
+  headers: {}, // associative array
+  data: {}, // Only for POST method - posted data
+  async: true, // false on default,
+  success: function(data){ // success function -> after response (2xx,3xx)
+  },
+  error: function(data){ // error function -> after response (4xx,5xx) or network error
+  },
+  progress: function(e){ // on every ajax change
+  }
+});
+```
 
 
+# Installation & configuration
+Simply add `<script src="mydom.js"></script>` at the end of `BODY`.
+Library is invoked by "myDOM" variable, but in initialisation is copied to variable "$".
 
-# Installation
-Simply add `<script src="mydom.js"></script>` at the end of `BODY` 
+As was wrotten, library is jQuery syntax friendly, so you can write `$("body")` like in jQuery code.
+
 
 
 # Selector prototypes
