@@ -33,9 +33,23 @@ Simply add `<script src="mydom.js"></script>` at the end of `BODY`
 | *Prototype* | *Inputs* | *Output* |
 |----------|----------|----------|
 | *hasClass* | `String` | `Boolean` |
-| *toggleClass* | `String` | `Boolean` |
-| *toggleClass* | `String` | `Boolean` |
-| *toggleClass* | `String` | `Boolean` |
-| *toggleClass* | `String` | `Boolean` |
-| *toggleClass* | `String` | `Boolean` |
-| *toggleClass* | `String` | `Boolean` |
+| *toggleClass* | `[String[,Boolean]]` | `$element` |
+| *addClass* | `String` | `$element` |
+| *removeClass* | `String` | `$element` |
+| *css* | `String\Object` | `$element\String` |
+| *attr* | `String` | `$element\String` |
+| *on* | `[String[,Function]]` | `$element` |
+| *prop* | `String[,Value]` | `$element\property` |
+| *is* | `String` | `Boolean` |
+| *find* | `String` | `$element` |
+| *offset* |  | `Object [top, left, bottom, right]` |
+| *html* | `String` | `$element` |
+| *txt* | `String` | `$element` |
+| *appendText* | `String` | `$element` |
+| *prependText* | `String` | `$element` |
+| *append* | `$element` | `$element` |
+| *preppend* | `$element` | `$element` |
+| *_height* |  | `Boolean` |
+| *_width* |  | `Boolean` |
+| *closest* | `String` | `$element` |
+
