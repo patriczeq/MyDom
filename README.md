@@ -30,6 +30,8 @@ Simply add `<script src="mydom.js"></script>` at the end of `BODY`
 
 
 # Selector prototypes
-| *Prototype* | *Inputs* | *Output* | 
+| *Prototype* | *Inputs* | *Output* |
+|----------|----------|----------|
 | *hasClass* | `String` | `Boolean` |
+|----------|----------|----------|
 | *toggleClass* | `String` | `Boolean` |
