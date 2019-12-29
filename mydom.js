@@ -1,7 +1,7 @@
 /*
  *	myDOM.js
  *	Better, lighter jQuery syntax frendly framework
- *	version 1.0.8 (myDOM ajaxer)
+ *	version 1.0.8
  *	Patrik Eder 2019
  */
 !(function(window) {
@@ -114,21 +114,21 @@
           } else if ((arguments.length === 2 && !arguments[1]) || (arguments.length === 1 && hasClass)) {
             ell.classList.remove(cls);
           }
-          return new MyDOM(ell);
+          return new myDOM(ell);
         },
         _el_.addClass = function() {
           if (!arguments.length) {
             throw Error(exceptionstrings("argmissing", [1]));
           }
           ell.classList.add(arguments[0]);
-          return new MyDOM(ell);
+          return new myDOM(ell);
         },
         _el_.removeClass = function() {
           if (!arguments.length) {
             throw Error(exceptionstrings("argmissing", [1]));
           }
           ell.classList.remove(arguments[0]);
-          return new MyDOM(ell);
+          return new myDOM(ell);
         },
         _el_.css = function() {
           var _fx = {
@@ -152,7 +152,7 @@
                 ell.style[p] = arguments[0][p];
               }
             }
-            return new MyDOM(ell);
+            return new myDOM(ell);
           } else if (arguments.length === 2 && typeof arguments[0] === "string" && typeof arguments[1] === "string") {
             if (_fx.p.indexOf(arguments[0]) !== -1) {
               for (var cc in _fx._) {
@@ -161,7 +161,7 @@
             } else {
               ell.style[arguments[0]] = arguments[1];
             }
-            return new MyDOM(ell);
+            return new myDOM(ell);
           }
         },
         _el_.attr = function() {
@@ -175,7 +175,7 @@
             return ell.getAttribute(arguments[0]);
           } else if (arguments.length == 2) {
             ell.setAttribute(arguments[0], arguments[1]);
-            return new MyDOM(ell);
+            return new myDOM(ell);
           }
         },
         _el_.on = function() {
@@ -183,7 +183,7 @@
             throw Error(exceptionstrings("argmissing", [2]));
           }
           ell.addEventListener(arguments[0], arguments[1]);
-          return new MyDOM(ell);
+          return new myDOM(ell);
         },
         _el_.prop = function() {
           if (!arguments.length) {
@@ -192,9 +192,12 @@
             return ell[arguments[0]];
           }
           ell[arguments[0]] = arguments[1];
-          return new MyDOM(ell);
+          return new myDOM(ell);
         },
         _el_.is = function() {
+        	if (!Element.prototype.matches) {
+			  Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+			}
           if (!arguments.length) {
             throw Error(exceptionstrings("argmissing", [1]));
           }
@@ -205,7 +208,7 @@
             throw Error(exceptionstrings("argmissing", [1]));
           }
           var found = ell.querySelectorAll(arguments[0]);
-          return found.length === 1 ? new MyDOM(found[0]) : new MyDOMs(arguments[0]);
+          return found.length === 1 ? new myDOM(found[0]) : new myDOMs(arguments[0]);
         },
         _el_.offset = function() {
           var offst = this.getBoundingClientRect();
@@ -216,7 +219,7 @@
             return ell.innerHTML;
           } else if (arguments.length === 1 && typeof arguments[0] === "string") {
             ell.innerHTML = arguments[0];
-            return new MyDOM(ell);
+            return new myDOM(ell);
           }
         },
         _el_.txt = function() {
@@ -224,23 +227,23 @@
             return ell.textContent;
           } else if (arguments.length === 1) {
             ell.textContent = String(arguments[0]);
-            return new MyDOM(ell);
+            return new myDOM(ell);
           }
         },
         _el_.appendText = function() {
           if (!arguments.length) {
-            return new MyDOM(ell);
+            return new myDOM(ell);
           } else if (arguments.length === 1) {
             ell.textContent += String(arguments[0]);
-            return new MyDOM(ell);
+            return new myDOM(ell);
           }
         },
         _el_.prependText = function() {
           if (!arguments.length) {
-            return new MyDOM(ell);
+            return new myDOM(ell);
           } else if (arguments.length === 1) {
             ell.textContent = ell.textContent + String(arguments[0]);
-            return new MyDOM(ell);
+            return new myDOM(ell);
           }
         },
         _el_.append = function() {
@@ -248,14 +251,14 @@
             throw Error(exceptionstrings("argmissing", [1]));
           }
           ell.appendChild(arguments[0]);
-          return new MyDOM(ell);
+          return new myDOM(ell);
         },
         _el_.prepend = function() {
           if (!arguments.length) {
             throw Error(exceptionstrings("argmissing", [1]));
           }
           ell.prepend(arguments[0]);
-          return new MyDOM(ell);
+          return new myDOM(ell);
         },
         _el_.insertAfter,
         _el_.after = function() {
@@ -265,7 +268,7 @@
           var obj = ell;
           ell = typeof arguments[0] === "string" ? document.querySelector(arguments[0]) : arguments[0];
           ell.after(obj);
-          return new MyDOM(ell);
+          return new myDOM(ell);
         },
         _el_.insertBefore,
         _el_.before = function() {
@@ -275,7 +278,7 @@
           var obj = ell;
           ell = typeof arguments[0] === "string" ? document.querySelector(arguments[0]) : arguments[0];
           ell.before(obj);
-          return new MyDOM(ell);
+          return new myDOM(ell);
         },
         _el_.height,
         _el_._height = function() {
@@ -283,7 +286,7 @@
             return ell.getBoundingClientRect().height;
           } else {
             ell.style.height = arguments[0];
-            return new MyDOM(ell);
+            return new myDOM(ell);
           }
         },
         _el_.width,
@@ -292,7 +295,7 @@
             return ell.getBoundingClientRect().width;
           } else {
             ell.style.width = arguments[0];
-            return new MyDOM(ell);
+            return new myDOM(ell);
           }
         },
         _el_.closest = function() {
@@ -305,13 +308,12 @@
                 return false;
               }
             }
-            return new MyDOM(ell);
+            return new myDOM(ell);
           }
         };
 
       return _el_;
     },
-
     _md_xhr_: function() {
       var that = this;
       return {
@@ -397,7 +399,6 @@
             "error" in options && "function" === typeof options.error ?
             options.error : false,
 
-            ("success" in options && "function" === typeof options.success) ||
             "async" in options && options.async === true,
 
             "dataType" in options ? options.dataType : false
@@ -444,15 +445,12 @@
   };
 
   var _mdm_ = new MYD_();
-  /* ******************************************** */
   /* 	BASE LOAD */
   window.myDOM = _mdm_._md_slctr_;
-  /* ajax */
+  /* 	AJAX SUPPORT */
   window.myDOM.get = _mdm_._md_xhr_().get;
   window.myDOM.post = _mdm_._md_xhr_().post;
   window.myDOM.ajax = _mdm_._md_xhr_().ajax;
   window.myDOM.template = _mdm_._md_xhr_().template;
-  /* Rename */
   window.$ = window.myDOM;
-  /* ******************************************** */
 })(window);
