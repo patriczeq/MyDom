@@ -1,6 +1,6 @@
 /*
  *	myDOM.js
- *	Better, lighter jQuery syntax frendly framework
+ *	Better, lighter jQuery syntax friendly framework
  *	version 1.0.8
  *	Patrik Eder 2019
  */
@@ -15,65 +15,7 @@
         post: {}
       },
       parse: true,
-      sts: {
-        200: [200, "OK"],
-		201: [200, "Created"],
-		202: [200, "Accepted"],
-		203: [200, "Non-Authoritative Information (od HTTP/1.1)"],
-		204: [200, "No Content"],
-		205: [200, "Reset Content"],
-		206: [200, "Partial Content"],
-		207: [200, "Multi-Status (WebDAV) (RFC 4918)"],
-		300: [300, "Multiple Choices"],
-		301: [300, "Moved Permanently"],
-		302: [300, "Found"],
-		303: [300, "See Other (since HTTP/1.1)"],
-		304: [300, "Not Modified"],
-		305: [300, "Use Proxy (since HTTP/1.1)"],
-		306: [300, "Switch Proxy"],
-		307: [300, "Temporary Redirect (since HTTP/1.1)"],
-		400: [400, "Bad Request"],
-		401: [400, "Unauthorized"],
-		402: [400, "Payment Required"],
-		403: [400, "Forbidden"],
-		404: [400, "Not Found"],
-		405: [400, "Method Not Allowed"],
-		406: [400, "Not Acceptable"],
-		407: [400, "Proxy Authentication Required"],
-		408: [400, "Request Timeout"],
-		409: [400, "Conflict"],
-		410: [400, "Gone"],
-		411: [400, "Length Required"],
-		412: [400, "Precondition Failed"],
-		413: [400, "Request Entity Too Large"],
-		414: [400, "Request-URI Too Long"],
-		415: [400, "Unsupported Media Type"],
-		416: [400, "Requested Range Not Satisfiable"],
-		417: [400, "Expectation Failed"],
-		418: [400, "I'm a teapot"],
-		422: [400, "Unprocessable Entity (WebDAV) (RFC 4918)"],
-		423: [400, "Locked (WebDAV) (RFC 4918)"],
-		424: [400, "Failed Dependency (WebDAV) (RFC 4918)"],
-		425: [400, "Unordered Collection (RFC 3648)"],
-		426: [400, "Upgrade Required (RFC 7231)"],
-		428: [400, "Precondition Required (RFC 6585)"],
-		429: [400, "Too Many Requests (RFC 6585)"],
-		431: [400, "Request Header Fields Too Large (RFC 6585)"],
-		449: [400, "Retry With"],
-		450: [400, "Blocked by Windows Parental Controls"],
-		451: [400, "Unavailable For Legal Reasons"],
-		499: [400, "Client Closed Request"],
-		500: [500, "Internal Server Error"],
-		501: [500, "Not Implemented"],
-		502: [500, "Bad Gateway"],
-		503: [500, "Service Unavailable"],
-		504: [500, "Gateway Timeout"],
-		505: [500, "HTTP Version Not Supported"],
-		506: [500, "Variant Also Negotiates (RFC 2295)"],
-		507: [500, "Insufficient Storage (WebDAV) (RFC 4918)"],
-		509: [500, "Bandwidth Limit Exceeded (Apache bw/limited extension)"],
-		510: [500, "Not Extended (RFC 2774)"]
-      }
+      sts: {}
     };
     this._xhr_.call = this._xhr_.default;
   };
@@ -341,18 +283,16 @@
             }
           };
           xhttp.onload = function() {
-            if (Number(xhttp.status) in that._xhr_.sts) {
-              var status = that._xhr_.sts[Number(xhttp.status)];
-              if ([200, 300].indexOf(status[0]) !== -1) {
-                return "function" === typeof success ?
-                  success(that._xhr_.parse ? that.response_parser(xhttp.response, forceParse) : xhttp.response) :
-                  xhttp;
-              } else if ([400, 500].indexOf(status[0]) !== -1) {
-                return "function" === typeof error ?
-                  error(xhttp.status + ": " + status[1] + "\n" + that._xhr_.call.url) :
-                  alert(xhttp.status + ": " + status[1] + "\n" + that._xhr_.call.url);
-              }
-            }
+	          var status = that._xhr_.sts[Number(xhttp.status)];
+	          if ([200, 300].indexOf(status[0]) !== -1 || !(Number(xhttp.status) in that._xhr_.sts)) {
+	            return "function" === typeof success ?
+	              success(that._xhr_.parse ? that.response_parser(xhttp.response, forceParse) : xhttp.response) :
+	              xhttp;
+	          } else if ([400, 500].indexOf(status[0]) !== -1) {
+	            return "function" === typeof error ?
+	              error(xhttp.status + ": " + status[1] + "\n" + that._xhr_.call.url) :
+	              alert(xhttp.status + ": " + status[1] + "\n" + that._xhr_.call.url);
+	          }
           };
           try {
             return xhttp.status === 0;
@@ -443,8 +383,68 @@
       return resp;
     },
   };
-
   var _mdm_ = new MYD_();
+  /* INCLUDE HTTP STATUSES */
+  _mdm_._xhr_.sts = {
+    200: [200, "OK"],
+	201: [200, "Created"],
+	202: [200, "Accepted"],
+	203: [200, "Non-Authoritative Information (od HTTP/1.1)"],
+	204: [200, "No Content"],
+	205: [200, "Reset Content"],
+	206: [200, "Partial Content"],
+	207: [200, "Multi-Status (WebDAV) (RFC 4918)"],
+	300: [300, "Multiple Choices"],
+	301: [300, "Moved Permanently"],
+	302: [300, "Found"],
+	303: [300, "See Other (since HTTP/1.1)"],
+	304: [300, "Not Modified"],
+	305: [300, "Use Proxy (since HTTP/1.1)"],
+	306: [300, "Switch Proxy"],
+	307: [300, "Temporary Redirect (since HTTP/1.1)"],
+	400: [400, "Bad Request"],
+	401: [400, "Unauthorized"],
+	402: [400, "Payment Required"],
+	403: [400, "Forbidden"],
+	404: [400, "Not Found"],
+	405: [400, "Method Not Allowed"],
+	406: [400, "Not Acceptable"],
+	407: [400, "Proxy Authentication Required"],
+	408: [400, "Request Timeout"],
+	409: [400, "Conflict"],
+	410: [400, "Gone"],
+	411: [400, "Length Required"],
+	412: [400, "Precondition Failed"],
+	413: [400, "Request Entity Too Large"],
+	414: [400, "Request-URI Too Long"],
+	415: [400, "Unsupported Media Type"],
+	416: [400, "Requested Range Not Satisfiable"],
+	417: [400, "Expectation Failed"],
+	418: [400, "I'm a teapot"],
+	422: [400, "Unprocessable Entity (WebDAV) (RFC 4918)"],
+	423: [400, "Locked (WebDAV) (RFC 4918)"],
+	424: [400, "Failed Dependency (WebDAV) (RFC 4918)"],
+	425: [400, "Unordered Collection (RFC 3648)"],
+	426: [400, "Upgrade Required (RFC 7231)"],
+	428: [400, "Precondition Required (RFC 6585)"],
+	429: [400, "Too Many Requests (RFC 6585)"],
+	431: [400, "Request Header Fields Too Large (RFC 6585)"],
+	449: [400, "Retry With"],
+	450: [400, "Blocked by Windows Parental Controls"],
+	451: [400, "Unavailable For Legal Reasons"],
+	499: [400, "Client Closed Request"],
+	500: [500, "Internal Server Error"],
+	501: [500, "Not Implemented"],
+	502: [500, "Bad Gateway"],
+	503: [500, "Service Unavailable"],
+	504: [500, "Gateway Timeout"],
+	505: [500, "HTTP Version Not Supported"],
+	506: [500, "Variant Also Negotiates (RFC 2295)"],
+	507: [500, "Insufficient Storage (WebDAV) (RFC 4918)"],
+	509: [500, "Bandwidth Limit Exceeded (Apache bw/limited extension)"],
+	510: [500, "Not Extended (RFC 2774)"]
+  };
+
   /* 	BASE LOAD */
   window.myDOM = _mdm_._md_slctr_;
   /* 	AJAX SUPPORT */
