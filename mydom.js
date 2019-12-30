@@ -261,7 +261,7 @@
       return {
         fetch: function(progress, success, error, async, forceParse) {
           var xhttp = new XMLHttpRequest();
-          xhttp.open(lib._xhr_.call.method, lib._xhr_.call.url, "function" === typeof success || async ===true);
+          xhttp.open(lib._xhr_.call.method, lib._xhr_.call.url, "function" === typeof success || async === true);
           if (lib._xhr_.call.method === "POST") {
             xhttp.send(lib._xhr_.call.post);
           } else {
@@ -365,9 +365,10 @@
     },
     response_parser: function(str, dataType) {
       var lib = this,
+        dataTypes = ["json","plain","html"],
         type = "String",
         resp = str;
-
+        dataType = dataType && dataTypes.indexOf(dataType.toLowerCase()) !== -1 ? dataType.toLowerCase() : false;
       if (lib.isJson(str)) {
         type = "object";
       } else if (/<(?=.*? .*?\/ ?>|br|hr|input|!--|wbr)[a-z]+.*?>|<([a-z]+).*?<\/\1>/i.test(str)) {
