@@ -4,7 +4,7 @@
  *	version 1.0.8
  *	Patrik Eder 2019
  */
-!(function(window) {
+!(function(factory) {
   "use strict";
   var MYD_ = function() {
     this._xhr_ = {
@@ -368,7 +368,7 @@
         dataTypes = ["json","plain","html"],
         type = "String",
         resp = str;
-        dataType = dataType && dataTypes.indexOf(dataType.toLowerCase()) !== -1 ? dataType.toLowerCase() : false;
+        dataType = dataType && dataType !== undefined && dataTypes.indexOf(dataType.toLowerCase()) !== -1 ? dataType.toLowerCase() : false;
       if (lib.isJson(str)) {
         type = "object";
       } else if (/<(?=.*? .*?\/ ?>|br|hr|input|!--|wbr)[a-z]+.*?>|<([a-z]+).*?<\/\1>/i.test(str)) {
