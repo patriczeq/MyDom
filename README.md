@@ -6,7 +6,7 @@ jQuery syntax friendly library
 It's shortcut of `document.querySelector("body")`, so it native support default prototypes/object getters & setters.
 
 Library has predefined jQuery like prototypes like `css`,`attr` or `html` (see bellow). 
-Thesee prototypes are usually getters/setters for selector.
+These prototypes are usually getters/setters for selector.
 When U use setter functionality, object returns back itself (U can continue with prototypes).
 
 It supports classes `MyDom(".foo")`, ids `MyDom("#bar")`, props `MyDom("[foo='bar']")` and HTMLElements itself.
