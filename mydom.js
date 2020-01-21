@@ -31,7 +31,8 @@
   };
   MYD_.prototype = {
     _mydom_: function(el) {
-      var elm = el !== undefined && typeof el === "string" ? document.querySelectorAll(el) : null,
+      	var lib = this,
+      	elm = el !== undefined && typeof el === "string" ? document.querySelectorAll(el) : null,
         ell = elm === null ? (el === undefined ? document : el) : (elm.length === 1 ? elm[0] : elm.length),
         exceptionstrings = function(id, addit) {
           return {
@@ -39,7 +40,18 @@
             argmissing: "Argument missing, excepted: " + addit[0] + " arg."
           } [id];
         };
-      if (!ell || typeof elm === "number") {
+      if(typeof ell === "number"){
+      	var elms = document.querySelectorAll(el);
+  		elms.each= function(fn){
+  			for(var e = 0; e < elms.length; e++){
+  				var _p = new MyDom(elms[e]);
+  				_p.fn = fn;
+  				_p.fn(e);
+  			}
+  		};
+  		return elms;
+      	
+      }else if (!ell) {
         console.log(exceptionstrings("notfound", [elm.length]));
         return false;
       }
@@ -314,11 +326,15 @@
 
       return _el_;
     },
-    _scroll_fx: function() {
+    _scroll_fx: function(event) {
       var elms = [],
         e = 0,
         elm = null,
-        parse = {};
+        parse = {},
+        targetElm = null;
+      /*
+      	Object in ViewPort functions
+      */
       // animation on viewport
       elms = document.querySelectorAll("[_animate-onview]");
       for (e = 0; e < elms.length; e++) {
@@ -356,6 +372,9 @@
           cls = elm.attr("_toggleclass-onview").replace("!", "");
         elm.toggleClass(cls, tgl);
       }
+      /*
+        	EOF Object in ViewPort functions
+        */
     },
     _mydom_xhr_: function() {
       var lib = this;
@@ -481,15 +500,74 @@
   };
   var _mdm_ = new MYD_();
   _mdm_.prev = _mdm_.elm;
-  _mdm_._xhr_.sts = {200:"OK",201:"Created",202:"Accepted",203:"Non-Authoritative Information (od HTTP/1.1)",204:"No Content",205:"Reset Content",206:"Partial Content",207:"Multi-Status (WebDAV) (RFC 4918)",300:"Multiple Choices",301:"Moved Permanently",302:"Found",303:"See Other (since HTTP/1.1)",304:"Not Modified",305:"Use Proxy (since HTTP/1.1)",306:"Switch Proxy",307:"Temporary Redirect (since HTTP/1.1)",400:"Bad Request",401:"Unauthorized",402:"Payment Required",403:"Forbidden",404:"Not Found",405:"Method Not Allowed",406:"Not Acceptable",407:"Proxy Authentication Required",408:"Request Timeout",409:"Conflict",410:"Gone",411:"Length Required",412:"Precondition Failed",413:"Request Entity Too Large",414:"Request-URI Too Long",415:"Unsupported Media Type",416:"Requested Range Not Satisfiable",417:"Expectation Failed",418:"I'm a teapot",422:"Unprocessable Entity (WebDAV) (RFC 4918)",423:"Locked (WebDAV) (RFC 4918)",424:"Failed Dependency (WebDAV) (RFC 4918)",425:"Unordered Collection (RFC 3648)",426:"Upgrade Required (RFC 7231)",428:"Precondition Required (RFC 6585)",429:"Too Many Requests (RFC 6585)",431:"Request Header Fields Too Large (RFC 6585)",449:"Retry With",450:"Blocked by Windows Parental Controls",451:"Unavailable For Legal Reasons",499:"Client Closed Request",500:"Internal Server Error",501:"Not Implemented",502:"Bad Gateway",503:"Service Unavailable",504:"Gateway Timeout",505:"HTTP Version Not Supported",506:"Variant Also Negotiates (RFC 2295)",507:"Insufficient Storage (WebDAV) (RFC 4918)",509:"Bandwidth Limit Exceeded (Apache bw/limited extension)",510:"Not Extended (RFC 2774)"};  var _mdm__ = _mdm_._mydom_;
+  _mdm_._xhr_.sts = {
+    200: "OK",
+    201: "Created",
+    202: "Accepted",
+    203: "Non-Authoritative Information (od HTTP/1.1)",
+    204: "No Content",
+    205: "Reset Content",
+    206: "Partial Content",
+    207: "Multi-Status (WebDAV) (RFC 4918)",
+    300: "Multiple Choices",
+    301: "Moved Permanently",
+    302: "Found",
+    303: "See Other (since HTTP/1.1)",
+    304: "Not Modified",
+    305: "Use Proxy (since HTTP/1.1)",
+    306: "Switch Proxy",
+    307: "Temporary Redirect (since HTTP/1.1)",
+    400: "Bad Request",
+    401: "Unauthorized",
+    402: "Payment Required",
+    403: "Forbidden",
+    404: "Not Found",
+    405: "Method Not Allowed",
+    406: "Not Acceptable",
+    407: "Proxy Authentication Required",
+    408: "Request Timeout",
+    409: "Conflict",
+    410: "Gone",
+    411: "Length Required",
+    412: "Precondition Failed",
+    413: "Request Entity Too Large",
+    414: "Request-URI Too Long",
+    415: "Unsupported Media Type",
+    416: "Requested Range Not Satisfiable",
+    417: "Expectation Failed",
+    418: "I'm a teapot",
+    422: "Unprocessable Entity (WebDAV) (RFC 4918)",
+    423: "Locked (WebDAV) (RFC 4918)",
+    424: "Failed Dependency (WebDAV) (RFC 4918)",
+    425: "Unordered Collection (RFC 3648)",
+    426: "Upgrade Required (RFC 7231)",
+    428: "Precondition Required (RFC 6585)",
+    429: "Too Many Requests (RFC 6585)",
+    431: "Request Header Fields Too Large (RFC 6585)",
+    449: "Retry With",
+    450: "Blocked by Windows Parental Controls",
+    451: "Unavailable For Legal Reasons",
+    499: "Client Closed Request",
+    500: "Internal Server Error",
+    501: "Not Implemented",
+    502: "Bad Gateway",
+    503: "Service Unavailable",
+    504: "Gateway Timeout",
+    505: "HTTP Version Not Supported",
+    506: "Variant Also Negotiates (RFC 2295)",
+    507: "Insufficient Storage (WebDAV) (RFC 4918)",
+    509: "Bandwidth Limit Exceeded (Apache bw/limited extension)",
+    510: "Not Extended (RFC 2774)"
+  };
+  var _mdm__ = _mdm_._mydom_;
   _mdm__.scrollfx = _mdm_._scroll_fx;
   _mdm__.get = _mdm_._mydom_xhr_().get;
   _mdm__.post = _mdm_._mydom_xhr_().post;
   _mdm__.ajax = _mdm_._mydom_xhr_().ajax;
   _mdm__.template = _mdm_._mydom_xhr_().template;
-  window._ = window.$ = window.MyDom = _mdm__ || _mdm_;
-  document.addEventListener('scroll', function(e) {
-    window._.scrollfx();
-  }, true);
-
+  window.MyDom = window._ = _mdm__ || _mdm_;
+  window._.scrollfx();
+  window._().on('scroll', function(e) {
+    window._.scrollfx(e);
+  });
 })(window);
