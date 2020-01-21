@@ -2,7 +2,7 @@
  *
  *	MyDom.js
  *	Better, lighter jQuery syntax friendly framework
- *	version 1.0.8
+ *	version 1.0.8.1
  *	Patrik Eder 2020
  *
  */
