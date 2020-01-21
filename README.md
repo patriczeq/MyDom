@@ -76,7 +76,15 @@ Library is invoked by "MyDom" variable, but in initialisation is copied to varia
 
 As was wrotten, library is jQuery syntax friendly, so you can write `$("body")` like in jQuery code.
 
-
+# ViewPort detection
+MyDom detecting scroll event on document, to get if elm is in viewport use `MyDom(".myelm").inview()`.
+There are prebuilt watch properties reacting to viewport:
+| *property* | *value* | *description* |
+|----------|----------|----------|
+| *_animate-onview* | `{'property': 'opacity', 'from': 0, 'to': 1, 'duration': 1000}` | *Runs animation if visible (once)* |
+| *_addclass-onview* | `myClass` | *Adds class if elm is visible (once)* |
+| *_removeclass-onview* | `myClass` | *Removes class if elm is visible (once)* |
+| *_toggleclass-onview* | `[!]myClass` | *Toggles class if elm is(not) visible* |
 
 # Selector prototypes
 | *Prototype* | *Inputs* | *Output* |
