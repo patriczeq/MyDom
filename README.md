@@ -79,12 +79,23 @@ As was wrotten, library is jQuery syntax friendly, so you can write `$("body")` 
 # ViewPort detection
 MyDom detecting scroll event on document, to get if elm is in viewport use `MyDom(".myelm").inview()`.
 There are prebuilt watch properties reacting to viewport:
-| *property* | *value* | *description* |
+
+| property | value | description |
 |----------|----------|----------|
 | *_animate-onview* | `{'property': 'opacity', 'from': 0, 'to': 1, 'duration': 1000}` | *Runs animation if visible (once)* |
 | *_addclass-onview* | `myClass` | *Adds class if elm is visible (once)* |
 | *_removeclass-onview* | `myClass` | *Removes class if elm is visible (once)* |
 | *_toggleclass-onview* | `[!]myClass` | *Toggles class if elm is(not) visible* |
+
+HTML:
+```
+<div 
+    class="testDiv" 
+    _animate-onview="{'property': 'opacity', 'from': 0, 'to': 1, 'duration': 1000}" 
+    _toggleclass-onview="visible"
+  >
+</div>
+```
 
 # Selector prototypes
 | *Prototype* | *Inputs* | *Output* |
