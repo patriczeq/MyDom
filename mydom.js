@@ -2,7 +2,7 @@
  *
  *	MyDom.js
  *	Better, lighter jQuery syntax friendly framework
- *	version 1.0.8
+ *	version 1.0.8.1
  *	Patrik Eder 2020
  *
  */
@@ -47,8 +47,10 @@
         return ell;
       };
       var _el_ = new El__();
-      	_el_.el = function() {return ell;};
-      	_el_.css = function() {
+      _el_.el = function() {
+        return ell;
+      };
+      _el_.css = function() {
           var _fx = {
             _: ["-webkit-", "-moz-", "-ms-", "-o-", ""],
             p: ["transition", "transform"]
@@ -262,7 +264,98 @@
             return new MyDom(ell);
           }
         };
-      return _el_;
+
+      _el_.inview = function() {
+        var rect = ell.getBoundingClientRect(),
+          windowHeight = (window.innerHeight || document.documentElement.clientHeight),
+          windowWidth = (window.innerWidth || document.documentElement.clientWidth),
+          vertInView = (rect.top <= windowHeight) && ((rect.top + rect.height) >= 0),
+          horInView = (rect.left <= windowWidth) && ((rect.left + rect.width) >= 0);
+
+        return (vertInView && horInView);
+      };
+      _el_.removeAttr = function() {
+        if (!arguments.length) {
+          throw Error(exceptionstrings("argmissing", [1]));
+        } else {
+          ell.removeAttribute(arguments[0]);
+          return new MyDom(ell);
+        }
+      };
+
+      _el_.animate = function() {
+        if (!arguments.length) {
+          throw Error(exceptionstrings("argmissing", [1]));
+        } else if (typeof arguments[0] === "object") {
+          var anim = arguments[0],
+            from = "from" in anim ? anim.from : false,
+            to = "to" in anim ? anim.to : false,
+            duration = "duration" in anim ? anim.duration : 500,
+            delay = "delay" in anim ? anim.delay : 0,
+            easing = "easing" in anim ? anim.easing : "linear",
+            property = "property" in anim ? anim.property : false,
+            backup_transition = ell.style.transition,
+            prefixes = ["-webkit-", "-moz-", "-o-", ""];
+          ell.style[property] = from;
+          for (var i in prefixes) {
+            ell.style[prefixes[i] + "transition"] = duration + "ms " + property + " " + easing + " " + delay + "ms";
+          }
+          ell.style[property] = to;
+          setTimeout(function() {
+            for (var i in prefixes) {
+              ell.style[prefixes[i] + "transition"] = backup_transition;
+            }
+          }, duration);
+        } else if (arguments.length) {
+          console.warn("excepted json object: " + arguments[0]);
+        }
+        return new MyDom(ell);
+      };
+
+	return _el_;
+    },
+    _scroll_fx: function() {
+      var elms = [],
+        e = 0,
+        elm = null,
+        parse = {};
+      // animation on viewport
+      elms = document.querySelectorAll("[_animate-onview]");
+      for (e = 0; e < elms.length; e++) {
+        elm = new MyDom(elms[e]);
+        parse = JSON.parse(elm.attr("_animate-onview").split("'").join('"'));
+        if (elm.inview()) {
+          elm.animate(parse).removeAttr("_animate-onview");
+        } else {
+          var s = {};
+          s[String(parse.property)] = parse.from;
+          elm.css(s);
+        }
+      }
+      // addClass on viewport
+      elms = document.querySelectorAll("[_addclass-onview]");
+      for (e = 0; e < elms.length; e++) {
+        elm = new MyDom(elms[e]);
+        if (elm.inview()) {
+          elm.addClass(elm.attr("_addclass-onview")).removeAttr("_addclass-onview");
+        }
+      }
+      // removeClass on viewport
+      elms = document.querySelectorAll("[_removeclass-onview]");
+      for (e = 0; e < elms.length; e++) {
+        elm = new MyDom(elms[e]);
+        if (elm.inview()) {
+          elm.removeClass(elm.attr("_removeclass-onview")).removeAttr("_removeclass-onview");
+        }
+      }
+      // toggleClass on viewport
+      elms = document.querySelectorAll("[_toggleclass-onview]");
+      for (e = 0; e < elms.length; e++) {
+        elm = new MyDom(elms[e]);
+        var tgl = elm.attr("_toggleclass-onview").indexOf("!") === 0 ? !elm.inview() : elm.inview(),
+          cls = elm.attr("_toggleclass-onview").replace("!", "");
+        elm.toggleClass(cls, tgl);
+      }
     },
     _mydom_xhr_: function() {
       var lib = this;
@@ -387,12 +480,17 @@
     },
   };
   var _mdm_ = new MYD_();
-  	_mdm_.prev = _mdm_.elm;
-  	_mdm_._xhr_.sts = JSON.parse(atob("eyIyMDAiOiJPSyIsIjIwMSI6IkNyZWF0ZWQiLCIyMDIiOiJBY2NlcHRlZCIsIjIwMyI6Ik5vbi1BdXRob3JpdGF0aXZlIEluZm9ybWF0aW9uIChvZCBIVFRQLzEuMSkiLCIyMDQiOiJObyBDb250ZW50IiwiMjA1IjoiUmVzZXQgQ29udGVudCIsIjIwNiI6IlBhcnRpYWwgQ29udGVudCIsIjIwNyI6Ik11bHRpLVN0YXR1cyAoV2ViREFWKSAoUkZDIDQ5MTgpIiwiMzAwIjoiTXVsdGlwbGUgQ2hvaWNlcyIsIjMwMSI6Ik1vdmVkIFBlcm1hbmVudGx5IiwiMzAyIjoiRm91bmQiLCIzMDMiOiJTZWUgT3RoZXIgKHNpbmNlIEhUVFAvMS4xKSIsIjMwNCI6Ik5vdCBNb2RpZmllZCIsIjMwNSI6IlVzZSBQcm94eSAoc2luY2UgSFRUUC8xLjEpIiwiMzA2IjoiU3dpdGNoIFByb3h5IiwiMzA3IjoiVGVtcG9yYXJ5IFJlZGlyZWN0IChzaW5jZSBIVFRQLzEuMSkiLCI0MDAiOiJCYWQgUmVxdWVzdCIsIjQwMSI6IlVuYXV0aG9yaXplZCIsIjQwMiI6IlBheW1lbnQgUmVxdWlyZWQiLCI0MDMiOiJGb3JiaWRkZW4iLCI0MDQiOiJOb3QgRm91bmQiLCI0MDUiOiJNZXRob2QgTm90IEFsbG93ZWQiLCI0MDYiOiJOb3QgQWNjZXB0YWJsZSIsIjQwNyI6IlByb3h5IEF1dGhlbnRpY2F0aW9uIFJlcXVpcmVkIiwiNDA4IjoiUmVxdWVzdCBUaW1lb3V0IiwiNDA5IjoiQ29uZmxpY3QiLCI0MTAiOiJHb25lIiwiNDExIjoiTGVuZ3RoIFJlcXVpcmVkIiwiNDEyIjoiUHJlY29uZGl0aW9uIEZhaWxlZCIsIjQxMyI6IlJlcXVlc3QgRW50aXR5IFRvbyBMYXJnZSIsIjQxNCI6IlJlcXVlc3QtVVJJIFRvbyBMb25nIiwiNDE1IjoiVW5zdXBwb3J0ZWQgTWVkaWEgVHlwZSIsIjQxNiI6IlJlcXVlc3RlZCBSYW5nZSBOb3QgU2F0aXNmaWFibGUiLCI0MTciOiJFeHBlY3RhdGlvbiBGYWlsZWQiLCI0MTgiOiJJJ20gYSB0ZWFwb3QiLCI0MjIiOiJVbnByb2Nlc3NhYmxlIEVudGl0eSAoV2ViREFWKSAoUkZDIDQ5MTgpIiwiNDIzIjoiTG9ja2VkIChXZWJEQVYpIChSRkMgNDkxOCkiLCI0MjQiOiJGYWlsZWQgRGVwZW5kZW5jeSAoV2ViREFWKSAoUkZDIDQ5MTgpIiwiNDI1IjoiVW5vcmRlcmVkIENvbGxlY3Rpb24gKFJGQyAzNjQ4KSIsIjQyNiI6IlVwZ3JhZGUgUmVxdWlyZWQgKFJGQyA3MjMxKSIsIjQyOCI6IlByZWNvbmRpdGlvbiBSZXF1aXJlZCAoUkZDIDY1ODUpIiwiNDI5IjoiVG9vIE1hbnkgUmVxdWVzdHMgKFJGQyA2NTg1KSIsIjQzMSI6IlJlcXVlc3QgSGVhZGVyIEZpZWxkcyBUb28gTGFyZ2UgKFJGQyA2NTg1KSIsIjQ0OSI6IlJldHJ5IFdpdGgiLCI0NTAiOiJCbG9ja2VkIGJ5IFdpbmRvd3MgUGFyZW50YWwgQ29udHJvbHMiLCI0NTEiOiJVbmF2YWlsYWJsZSBGb3IgTGVnYWwgUmVhc29ucyIsIjQ5OSI6IkNsaWVudCBDbG9zZWQgUmVxdWVzdCIsIjUwMCI6IkludGVybmFsIFNlcnZlciBFcnJvciIsIjUwMSI6Ik5vdCBJbXBsZW1lbnRlZCIsIjUwMiI6IkJhZCBHYXRld2F5IiwiNTAzIjoiU2VydmljZSBVbmF2YWlsYWJsZSIsIjUwNCI6IkdhdGV3YXkgVGltZW91dCIsIjUwNSI6IkhUVFAgVmVyc2lvbiBOb3QgU3VwcG9ydGVkIiwiNTA2IjoiVmFyaWFudCBBbHNvIE5lZ290aWF0ZXMgKFJGQyAyMjk1KSIsIjUwNyI6Ikluc3VmZmljaWVudCBTdG9yYWdlIChXZWJEQVYpIChSRkMgNDkxOCkiLCI1MDkiOiJCYW5kd2lkdGggTGltaXQgRXhjZWVkZWQgKEFwYWNoZSBidy9saW1pdGVkIGV4dGVuc2lvbikiLCI1MTAiOiJOb3QgRXh0ZW5kZWQgKFJGQyAyNzc0KSJ9"));
+  _mdm_.prev = _mdm_.elm;
+  _mdm_._xhr_.sts = JSON.parse(atob("eyIyMDAiOiJPSyIsIjIwMSI6IkNyZWF0ZWQiLCIyMDIiOiJBY2NlcHRlZCIsIjIwMyI6Ik5vbi1BdXRob3JpdGF0aXZlIEluZm9ybWF0aW9uIChvZCBIVFRQLzEuMSkiLCIyMDQiOiJObyBDb250ZW50IiwiMjA1IjoiUmVzZXQgQ29udGVudCIsIjIwNiI6IlBhcnRpYWwgQ29udGVudCIsIjIwNyI6Ik11bHRpLVN0YXR1cyAoV2ViREFWKSAoUkZDIDQ5MTgpIiwiMzAwIjoiTXVsdGlwbGUgQ2hvaWNlcyIsIjMwMSI6Ik1vdmVkIFBlcm1hbmVudGx5IiwiMzAyIjoiRm91bmQiLCIzMDMiOiJTZWUgT3RoZXIgKHNpbmNlIEhUVFAvMS4xKSIsIjMwNCI6Ik5vdCBNb2RpZmllZCIsIjMwNSI6IlVzZSBQcm94eSAoc2luY2UgSFRUUC8xLjEpIiwiMzA2IjoiU3dpdGNoIFByb3h5IiwiMzA3IjoiVGVtcG9yYXJ5IFJlZGlyZWN0IChzaW5jZSBIVFRQLzEuMSkiLCI0MDAiOiJCYWQgUmVxdWVzdCIsIjQwMSI6IlVuYXV0aG9yaXplZCIsIjQwMiI6IlBheW1lbnQgUmVxdWlyZWQiLCI0MDMiOiJGb3JiaWRkZW4iLCI0MDQiOiJOb3QgRm91bmQiLCI0MDUiOiJNZXRob2QgTm90IEFsbG93ZWQiLCI0MDYiOiJOb3QgQWNjZXB0YWJsZSIsIjQwNyI6IlByb3h5IEF1dGhlbnRpY2F0aW9uIFJlcXVpcmVkIiwiNDA4IjoiUmVxdWVzdCBUaW1lb3V0IiwiNDA5IjoiQ29uZmxpY3QiLCI0MTAiOiJHb25lIiwiNDExIjoiTGVuZ3RoIFJlcXVpcmVkIiwiNDEyIjoiUHJlY29uZGl0aW9uIEZhaWxlZCIsIjQxMyI6IlJlcXVlc3QgRW50aXR5IFRvbyBMYXJnZSIsIjQxNCI6IlJlcXVlc3QtVVJJIFRvbyBMb25nIiwiNDE1IjoiVW5zdXBwb3J0ZWQgTWVkaWEgVHlwZSIsIjQxNiI6IlJlcXVlc3RlZCBSYW5nZSBOb3QgU2F0aXNmaWFibGUiLCI0MTciOiJFeHBlY3RhdGlvbiBGYWlsZWQiLCI0MTgiOiJJJ20gYSB0ZWFwb3QiLCI0MjIiOiJVbnByb2Nlc3NhYmxlIEVudGl0eSAoV2ViREFWKSAoUkZDIDQ5MTgpIiwiNDIzIjoiTG9ja2VkIChXZWJEQVYpIChSRkMgNDkxOCkiLCI0MjQiOiJGYWlsZWQgRGVwZW5kZW5jeSAoV2ViREFWKSAoUkZDIDQ5MTgpIiwiNDI1IjoiVW5vcmRlcmVkIENvbGxlY3Rpb24gKFJGQyAzNjQ4KSIsIjQyNiI6IlVwZ3JhZGUgUmVxdWlyZWQgKFJGQyA3MjMxKSIsIjQyOCI6IlByZWNvbmRpdGlvbiBSZXF1aXJlZCAoUkZDIDY1ODUpIiwiNDI5IjoiVG9vIE1hbnkgUmVxdWVzdHMgKFJGQyA2NTg1KSIsIjQzMSI6IlJlcXVlc3QgSGVhZGVyIEZpZWxkcyBUb28gTGFyZ2UgKFJGQyA2NTg1KSIsIjQ0OSI6IlJldHJ5IFdpdGgiLCI0NTAiOiJCbG9ja2VkIGJ5IFdpbmRvd3MgUGFyZW50YWwgQ29udHJvbHMiLCI0NTEiOiJVbmF2YWlsYWJsZSBGb3IgTGVnYWwgUmVhc29ucyIsIjQ5OSI6IkNsaWVudCBDbG9zZWQgUmVxdWVzdCIsIjUwMCI6IkludGVybmFsIFNlcnZlciBFcnJvciIsIjUwMSI6Ik5vdCBJbXBsZW1lbnRlZCIsIjUwMiI6IkJhZCBHYXRld2F5IiwiNTAzIjoiU2VydmljZSBVbmF2YWlsYWJsZSIsIjUwNCI6IkdhdGV3YXkgVGltZW91dCIsIjUwNSI6IkhUVFAgVmVyc2lvbiBOb3QgU3VwcG9ydGVkIiwiNTA2IjoiVmFyaWFudCBBbHNvIE5lZ290aWF0ZXMgKFJGQyAyMjk1KSIsIjUwNyI6Ikluc3VmZmljaWVudCBTdG9yYWdlIChXZWJEQVYpIChSRkMgNDkxOCkiLCI1MDkiOiJCYW5kd2lkdGggTGltaXQgRXhjZWVkZWQgKEFwYWNoZSBidy9saW1pdGVkIGV4dGVuc2lvbikiLCI1MTAiOiJOb3QgRXh0ZW5kZWQgKFJGQyAyNzc0KSJ9"));
   var _mdm__ = _mdm_._mydom_;
-	  _mdm__.get = _mdm_._mydom_xhr_().get;
-	  _mdm__.post = _mdm_._mydom_xhr_().post;
-	  _mdm__.ajax = _mdm_._mydom_xhr_().ajax;
-	  _mdm__.template = _mdm_._mydom_xhr_().template;
+  _mdm__.scrollfx = _mdm_._scroll_fx;
+  _mdm__.get = _mdm_._mydom_xhr_().get;
+  _mdm__.post = _mdm_._mydom_xhr_().post;
+  _mdm__.ajax = _mdm_._mydom_xhr_().ajax;
+  _mdm__.template = _mdm_._mydom_xhr_().template;
   window._ = window.$ = window.MyDom = _mdm__ || _mdm_;
+  document.addEventListener('scroll', function(e) {
+    window._.scrollfx();
+  }, true);
+
 })(window);
