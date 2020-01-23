@@ -1,5 +1,4 @@
 /*
- *
  *	MyDom.js
  *	Better, lighter jQuery syntax friendly framework
  *	version 1.0.8.1
@@ -24,7 +23,8 @@
         json: "application/json, text/javascript"
       },
       parse: true,
-      sts: {}
+      sts: {},
+      queue: []
     };
     this._xhr_.call = this._xhr_.default;
     this.elm = null;
@@ -33,39 +33,53 @@
     _mydom_: function(el) {
       	var lib = this,
       	elm = el !== undefined && typeof el === "string" ? document.querySelectorAll(el) : null,
-        ell = elm === null ? (el === undefined ? document : el) : (elm.length === 1 ? elm[0] : elm.length),
+        ell = elm === null ? (el === undefined ? document : el) : (elm.length === 1 ? elm[0] : elm),
         exceptionstrings = function(id, addit) {
           return {
-            notfound: "Selector " + String(el) + " was not found in this document.",
-            argmissing: "Argument missing, excepted: " + addit[0] + " arg."
+            notfound: 	"Selector " + String(el) + " was not found in this document.",
+            argmissing: "Argument missing, excepted: " + addit[0] + " arg.",
+            badinput: 	"Bad input argument, excepted: " +  addit[0] +", got: " + addit[1]
           } [id];
         };
-      if(typeof ell === "number"){
-      	var elms = document.querySelectorAll(el);
-  		elms.each= function(fn){
-  			for(var e = 0; e < elms.length; e++){
-  				var _p = new MyDom(elms[e]);
-  				_p.fn = fn;
-  				_p.fn(e);
+      if(el !== undefined && typeof el === "string" && !document.querySelectorAll(el).length){
+      	return !1;
+      }
+      if(ell.length > 1){
+      	var Els__ = function(){
+      		return ell;
+      	},
+      	_els_ = new Els__();
+  		_els_.each= function(fn){
+  			if(fn === undefined){
+  				throw Error(exceptionstrings("argmissing", [1]));
+  			}else if("function" !== typeof fn){
+  				throw Error(exceptionstrings("badinput", ["function", typeof fn]));
+  			}else{
+  				for(var e = 0; e < ell.length; e++){
+	  				var _p = new MyDom(ell[e]);
+	  				_p.fn = fn;
+	  				_p.fn(e,_p);
+	  			}
   			}
+  			return new MyDom(el);
   		};
-  		return elms;
-      	
+  		return ell;
       }else if (!ell) {
         console.log(exceptionstrings("notfound", [elm.length]));
         return false;
       }
       var El__ = function() {
         return ell;
-      };
-      var _el_ = new El__();
+      },
+      _el_ = new El__();
       _el_.el = function() {
         return ell;
       };
+      _el_.length = 1;
       _el_.css = function() {
           var _fx = {
             _: ["-webkit-", "-moz-", "-ms-", "-o-", ""],
-            p: ["transition", "transform"]
+            p: ["transition", "transform", "animation"]
           };
           if (ell.style === undefined) {
             return undefined;
@@ -379,55 +393,90 @@
     _mydom_xhr_: function() {
       var lib = this;
       return {
+      	queue: function(){
+      		return {
+      			abort: function(n){
+      				for(var q = 0; q < lib._xhr_.queue.length; q++){
+      					if(n===q||n===undefined){
+      						try{lib._xhr_.queue[q].cancelRequested=true;}catch(e){}
+							try{lib._xhr_.queue[q].onprogress=null; xhr[i].onload=null; xhr[i].onerror=null;}catch(e){}
+							try{lib._xhr_.queue[q].upload.onprogress=null; xhr[i].upload.onload=null; xhr[i].upload.onerror=null;}catch(e){}
+							try{lib._xhr_.queue[q].abort();}catch(e){}
+							try{delete(lib._xhr_.queue[q]);lib._xhr_.queue=[]}catch(e){}
+      					}
+      				}
+      				return true;
+      			},
+      			get: function(q){
+      				return q !== undefined && typeof q === "number" ? lib._xhr_.queue[q] : lib._xhr_.queue;
+      			}
+      		};
+      	},
         fetch: function(progress, success, error, async, forceParse) {
-          var xhttp = new XMLHttpRequest();
-          xhttp.open(lib._xhr_.call.method, lib._xhr_.call.url, "function" === typeof success || async ===true);
+        	var xhr = new XMLHttpRequest(),
+        		q = lib._xhr_.queue.length,
+        		r = null;
+
+          xhr.open(lib._xhr_.call.method, lib._xhr_.call.url, "function" === typeof success || async === true);
+          lib._xhr_.queue.push(xhr);
           if (lib._xhr_.call.method === "POST") {
-            xhttp.send(lib._xhr_.call.post);
+            lib._xhr_.queue[q].send(lib._xhr_.call.post);
           } else {
-            xhttp.send();
+            lib._xhr_.queue[q].send();
           }
           if ("function" !== typeof success) {
-            return lib._xhr_.parse ? lib.response_parser(xhttp.response, forceParse) : xhttp.response;
+            r = lib._xhr_.parse ? lib.response_parser(lib._xhr_.queue[q].response, forceParse) : lib._xhr_.queue[q].response;
+            	lib._mydom_xhr_().queue().abort(q);
+            return r;
           }
-          xhttp.onprogress = function(e) {
+          lib._xhr_.queue[q].onprogress = function(e) {
             if ("function" === typeof progress) {
-              return progress(e);
+              return progress(e, this);
             }
           };
-          xhttp.onerror = function(e) {
+          lib._xhr_.queue[q].onerror = function(e) {
             if ("function" === typeof error) {
-              error("Network Error", e);
+              error(e,this);
+              lib._mydom_xhr_().queue().abort(q);
             } else {
-              throw Error("MyDOM " + lib._xhr_.call.method + " request to " + lib._xhr_.call.url + " network error");
+              throw Error("MyDom " + lib._xhr_.call.method + " request to " + lib._xhr_.call.url + " network error");
             }
           };
-          xhttp.onload = function() {
-            var status = Number(xhttp.status) in lib._xhr_.sts ? lib._xhr_.sts[xhttp.status] : "unknown",
-              co_sts = Math.round(Number(xhttp.status) / 100);
-            if ([2, 3].indexOf(co_sts) !== -1 || !(Number(xhttp.status) in lib._xhr_.sts)) {
-              return "function" === typeof success ?
-                success(lib._xhr_.parse ? lib.response_parser(xhttp.response, forceParse) : xhttp.response) :
-                xhttp;
+          lib._xhr_.queue[q].onload = function(e) {
+            var status = Number(lib._xhr_.queue[q].status) in lib._xhr_.sts ? lib._xhr_.sts[lib._xhr_.queue[q].status] : "unknown",
+              co_sts = Math.round(Number(lib._xhr_.queue[q].status) / 100);
+            if ([2, 3].indexOf(co_sts) !== -1 || !(Number(lib._xhr_.queue[q].status) in lib._xhr_.sts)) {
+              r = "function" === typeof success ? success(lib._xhr_.parse ? lib.response_parser(lib._xhr_.queue[q].response, forceParse) : lib._xhr_.queue[q].response, this) : lib._xhr_.queue[q];
+              lib._mydom_xhr_().queue().abort(q);
+              return r;
             } else if ([4, 5].indexOf(co_sts) && "function" === typeof error) {
-              error(xhttp.status + ": " + status + ", url:" + lib._xhr_.call.url);
+              error(lib._xhr_.queue[q].status + ": " + status + ", url:" + lib._xhr_.call.url);
+              try{delete(lib._xhr_.queue[q]);}catch(e){console.log(e)}
             } else {
-              throw Error("MyDOM " + lib._xhr_.call.method + " request to '" + lib._xhr_.call.url + "' returned code " + xhttp.status + ": " + status);
+            	r = "MyDom " + lib._xhr_.call.method + " request to '" + lib._xhr_.call.url + "' returned code " + lib._xhr_.queue[q].status + ": " + status;
+            	lib._mydom_xhr_().queue().abort(q);
+              throw Error(r);
             }
           };
           try {
-            return xhttp.status === 0;
+            return lib._xhr_.queue[q].status === 0;
           } catch (e) {
             return e;
           }
         },
         get: function(url, success, error) {
+          if(url===undefined){
+          	throw Error(exceptionstrings("argmissing", [1]));
+          }
           lib._xhr_.call.method = "GET";
           lib._xhr_.call.url = url;
           lib._xhr_.parse = false;
           return lib._mydom_xhr_().fetch(false, success, error);
         },
         post: function(url, data, success, error) {
+        	if(url===undefined){
+          	throw Error(exceptionstrings("argmissing", [1]));
+          }
           lib._xhr_.call.method = "POST";
           lib._xhr_.call.post = data;
           lib._xhr_.call.url = url;
@@ -435,6 +484,7 @@
           return lib._mydom_xhr_().fetch(false, success, error);
         },
         ajax: function(url, options) {
+        	
           if (url === undefined) {
             return;
           }
@@ -444,6 +494,10 @@
             options.url :
             lib._xhr_.default.url
           );
+          
+          if(!arguments.length){
+          	throw Error(exceptionstrings("argmissing", [1]));
+          }
           var opt = {
             opt: function(opt, options) {
               return opt in options ? options[opt] : lib._xhr_.default[opt];
@@ -564,6 +618,7 @@
   _mdm__.get = _mdm_._mydom_xhr_().get;
   _mdm__.post = _mdm_._mydom_xhr_().post;
   _mdm__.ajax = _mdm_._mydom_xhr_().ajax;
+  _mdm__.ajaxQ = _mdm_._mydom_xhr_().queue();
   _mdm__.template = _mdm_._mydom_xhr_().template;
   window.MyDom = window._ = _mdm__ || _mdm_;
   window._.scrollfx();
